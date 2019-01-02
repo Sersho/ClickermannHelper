@@ -6,8 +6,14 @@ namespace ClickermannHelper
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, GitHub!");
-            Console.ReadLine();
+            switch (args[0])
+            {
+                case "TMessage":
+                {
+                    Telegram.SendMessage(args);
+                    break;
+                }
+            }
         }
     }
 }
