@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ClickermannHelper
+﻿namespace ClickermannHelper
 {
     class Program
     {
@@ -13,6 +11,13 @@ namespace ClickermannHelper
                     Telegram.SendMessage(args);
                     break;
                 }
+
+                case "TPicture":
+                {
+                    Telegram.SendPicture(args);
+                    break;
+                }
+
             }
         }
     }

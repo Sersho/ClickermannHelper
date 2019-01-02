@@ -1,7 +1,8 @@
-﻿using System.Net;
+﻿using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
+using System.Threading;
 
 namespace ClickermannHelper
 {
@@ -49,14 +50,82 @@ namespace ClickermannHelper
                 webClient = new HttpClient(Handle);
             }
 
-            webClient.GetAsync($"https://api.telegram.org/bot{BotToken}/sendMessage?chat_id={ChatId}&text={Message}");
-            webClient.Dispose();
+            using (webClient)
+            {
+                var Status = webClient.GetAsync($"https://api.telegram.org/bot{BotToken}/sendMessage?chat_id={ChatId}&text={Message}");
+
+                while (!Status.IsCompleted)
+                {
+                    Thread.Sleep(5);
+                }
+            }
+           
 
             #endregion
         }
 
         #endregion
 
+        #region Отправляем картинку в Telegram
 
+        public static void SendPicture(string[] Data)
+        {
+            Regex ProxyRegex = new Regex("([0-9]{1,3})\\.([0-9]{1,3}).([0-9]{1,3})\\.([0-9]{1,3}):([0-9]{2,8})");
+
+            string BotToken = Data[1];
+            string ChatId = Data[2];
+            string Proxy = ProxyRegex.IsMatch(Data[3]) ? Data[3] : null;
+            string PicturePath = Proxy == null ? Data[3].Replace("%", " ") : Data[4].Replace("%", " ");
+            string PictureDescription = GetDescription();
+
+
+            #region Собираем описание
+
+            string GetDescription()
+            {
+                string Concat = "";
+
+                for (int i = Proxy == null ? 4 : 5; i < Data.Length; i++)
+                {
+                    Concat += Data[i] + " ";
+                }
+
+                return Concat;
+            }
+
+            #endregion
+
+            #region Отправляем картинку
+
+            if (Proxy != null)
+            {
+                WebProxy ProxyObject = new WebProxy(Proxy);
+                HttpClientHandler Handle = new HttpClientHandler() { Proxy = ProxyObject };
+                webClient = new HttpClient(Handle);
+            }
+
+            //Подготавливаем MultiPart
+
+            MultipartFormDataContent MultipartData = new MultipartFormDataContent();
+            FileStream FS = new FileStream(PicturePath, FileMode.Open, FileAccess.Read);
+            MultipartData.Add(new StringContent(ChatId), "chat_id");
+            MultipartData.Add(new StreamContent(FS), "photo", "Photo");
+            MultipartData.Add(new StringContent(PictureDescription), "caption");
+
+            using (webClient)
+            {
+                var Status = webClient.PostAsync($"https://api.telegram.org/bot{BotToken}/sendPhoto", MultipartData);
+
+                while (!Status.IsCompleted)
+                {
+                    Thread.Sleep(10);
+                }
+            }
+
+            #endregion
+
+        }
+
+        #endregion
     }
 }
