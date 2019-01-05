@@ -20,9 +20,13 @@ namespace ClickermannHelper
         {
             Regex ProxyRegex = new Regex("([0-9]{1,3})\\.([0-9]{1,3}).([0-9]{1,3})\\.([0-9]{1,3}):([0-9]{2,8})");
 
-            string BotToken = Data[1];
-            string ChatId = Data[2];
-            string Proxy = ProxyRegex.IsMatch(Data[3]) ? Data[3] : null;
+            bool UseINI = INIManager.Default.GetPrivateString("Telegram", "UseINI") == "1" ? true : false;
+
+            string BotToken = UseINI ? INIManager.Default.GetPrivateString("Telegram", "BotToken") : Data[1];
+            string ChatId = UseINI ? INIManager.Default.GetPrivateString("Telegram", "ChatId") : Data[2];
+            string Proxy = UseINI ? INIManager.Default.GetPrivateString("Telegram", "Proxy") : Data[3];
+            Proxy = ProxyRegex.IsMatch(Proxy) ? Proxy : null;
+
             string Message = GetMessage();
 
             #region Собираем сообщение
@@ -31,9 +35,19 @@ namespace ClickermannHelper
             {
                 string Concat = "";
 
-                for (int i = Proxy == null ? 3 : 4; i < Data.Length; i++)
+                if (!UseINI)
                 {
-                    Concat += Data[i] + " ";
+                    for (int i = Proxy == null ? 3 : 4; i < Data.Length; i++)
+                    {
+                        Concat += Data[i] + " ";
+                    }
+                }
+                else
+                {
+                    for (int i = 1; i < Data.Length; i++)
+                    {
+                        Concat += Data[i] + " ";
+                    }
                 }
 
                 return Concat;
@@ -72,10 +86,26 @@ namespace ClickermannHelper
         {
             Regex ProxyRegex = new Regex("([0-9]{1,3})\\.([0-9]{1,3}).([0-9]{1,3})\\.([0-9]{1,3}):([0-9]{2,8})");
 
-            string BotToken = Data[1];
-            string ChatId = Data[2];
-            string Proxy = ProxyRegex.IsMatch(Data[3]) ? Data[3] : null;
-            string PicturePath = Proxy == null ? Data[3].Replace("%", " ") : Data[4].Replace("%", " ");
+            bool UseINI = INIManager.Default.GetPrivateString("Telegram", "UseINI") == "1" ? true : false;
+
+            string BotToken = UseINI ? INIManager.Default.GetPrivateString("Telegram", "BotToken") : Data[1];
+            string ChatId = UseINI ? INIManager.Default.GetPrivateString("Telegram", "ChatId") : Data[2];
+            string Proxy = UseINI ? INIManager.Default.GetPrivateString("Telegram", "Proxy") : Data[3];
+            Proxy = ProxyRegex.IsMatch(Proxy) ? Proxy : null;
+            string PicturePath = "";
+
+            //Если есть прокси
+            if (Proxy != null)
+            {
+                if (UseINI) PicturePath = PicturePath = Data[1].Replace("%", " ");
+                else PicturePath = Data[4].Replace("%", " ");
+            }
+            else
+            {
+                if (UseINI) PicturePath = PicturePath = Data[1].Replace("%", " ");
+                else PicturePath = Data[3].Replace("%", " ");
+            }
+
             string PictureDescription = GetDescription();
 
 
@@ -85,9 +115,19 @@ namespace ClickermannHelper
             {
                 string Concat = "";
 
-                for (int i = Proxy == null ? 4 : 5; i < Data.Length; i++)
+                if (!UseINI)
                 {
-                    Concat += Data[i] + " ";
+                    for (int i = Proxy == null ? 4 : 5; i < Data.Length; i++)
+                    {
+                        Concat += Data[i] + " ";
+                    }
+                }
+                else
+                {
+                    for (int i = 2; i < Data.Length; i++)
+                    {
+                        Concat += Data[i] + " ";
+                    }
                 }
 
                 return Concat;

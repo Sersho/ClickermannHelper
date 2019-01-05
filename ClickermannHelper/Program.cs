@@ -1,23 +1,31 @@
-﻿namespace ClickermannHelper
+﻿using System;
+using System.Threading;
+
+namespace ClickermannHelper
 {
     class Program
     {
         static void Main(string[] args)
         {
+            
             switch (args[0])
             {
                 case "TMessage":
-                {
-                    Telegram.SendMessage(args);
-                    break;
-                }
+                    {
+                        Telegram.SendMessage(args);
+                        break;
+                    }
 
                 case "TPicture":
+                    {
+                        Telegram.SendPicture(args);
+                        break;
+                    }
+                case "OSVersion":
                 {
-                    Telegram.SendPicture(args);
+                    SysInfo.GetOSVersion();
                     break;
                 }
-
             }
         }
     }
