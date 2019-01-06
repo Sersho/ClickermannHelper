@@ -8,22 +8,22 @@ namespace ClickermannHelper
         static void Main(string[] args)
         {
             
-            switch (args[0])
+            switch (args[0].ToUpper())
             {
-                case "TMessage":
+                case "TMESSAGE":
                     {
                         Telegram.SendMessage(args);
                         break;
                     }
 
-                case "TPicture":
+                case "TPICTURE":
                     {
                         Telegram.SendPicture(args);
                         break;
                     }
-                case "OSVersion":
+                case "SYSTEMINFO":
                 {
-                    SysInfo.GetOSVersion();
+                    SysInfo.GetInfo();
                     break;
                 }
             }
