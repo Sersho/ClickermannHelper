@@ -24,7 +24,7 @@ namespace ClickermannHelper
             string ChatId = INIManager.Default.GetPrivateString("Telegram", "ChatId");
             string Proxy = INIManager.Default.GetPrivateString("Telegram", "Proxy");
             Proxy = ProxyRegex.IsMatch(Proxy) ? Proxy : null;
-
+            
             string Message = GetMessage();
 
             #region Собираем сообщение
